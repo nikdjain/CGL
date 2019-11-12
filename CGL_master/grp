@@ -1,0 +1,108 @@
+#include<math.h>
+#include<iostream>
+#include<GL/glut.h>
+using namespace std;
+
+float inc=1.0;
+float angle=135;
+
+float drawCircle(float seg,float rad,float sx,float sy)
+{
+    glBegin(GL_LINE_LOOP);
+    for(int i=0;i<seg;i++)
+    {
+        float theta=2.0*3.142*float(i)/float(seg); //get the current angle
+        float x=rad*cos(theta);
+        float y=rad*sin(theta);
+        glVertex2f(x+sx,y+sy);
+    }
+    glEnd();
+}
+
+void draw(float x1,float y1,float angle)
+{
+    float seg=100;
+    float rad=10.0;
+
+    //Drawing Clock main Circle
+    glLineWidth(4);
+    glColor3f(0,0,1);
+    drawCircle(seg,rad,x1,y1);
+
+    //Drawing Minute Line
+    glColor3f(1,1,0);
+    glLineWidth(1);
+    glBegin(GL_LINES);
+    glVertex2f(x1,y1);
+    glVertex2f(x1,(rad/3.0)*2.0 + 1);
+    glEnd();
+
+    //Drawing Hour Line
+  glColor3f(1,0,0);
+    glLineWidth(4);
+    glBegin(GL_LINES);
+    glVertex2f(x1,y1);
+    glVertex2f(rad/3.0,rad/3.0 + 1);
+    glEnd();
+    //Drawing Pendulum Circle
+    double radians=angle*3.142/180;
+    float x2=(rad*3.4)*cos(radians);
+    float y2=(rad*3.4)*sin(radians);
+    float rad2=rad/3.0;
+
+    glColor3f(0,1,0);
+    glLineWidth(2);
+    drawCircle(seg,rad2,x2,y2);
+
+    glBegin(GL_LINES);
+    glVertex2f(x1,-1*(rad)+0.2);
+    glVertex2f(x2,y2);
+    glEnd();
+}
+
+
+void display()
+{
+    glClearColor(0,0,0,1);
+    glClear(GL_COLOR_BUFFER_BIT);
+    glLoadIdentity();
+    glTranslatef(-10,10,-30);
+    glColor3f(0,255,0);
+if(angle>315)
+{
+angle=315;
+inc=-inc;
+}
+if(angle<225)
+{
+angle=225;
+inc=-inc;
+}
+    angle += inc;
+    draw(0,0,angle);
+    glutSwapBuffers();
+}
+void reshape(int w,int h)
+{
+	glMatrixMode (GL_PROJECTION);  //maps camera to screen
+	glLoadIdentity ();
+	GLfloat te;
+	te=(GLfloat)w/(GLfloat)h;
+	gluPerspective(100,te,0.5,100.0);
+	glMatrixMode (GL_MODELVIEW);
+}
+int main(int argc, char** argv)
+{
+
+    glutInit(&argc,argv);
+    glutInitDisplayMode(GLUT_DOUBLE);
+    glutInitWindowSize(800,600);
+    glutInitWindowPosition(0,0);
+    glutCreateWindow("COMPUTER_GRAPHICS_PROJECT_CLOCK_WITH_PENDULUM");
+    glutDisplayFunc(display);
+    glutIdleFunc(display);
+    glutReshapeFunc(reshape);
+    glutMainLoop();
+    return 0;
+}
+// g++ grp.cpp -lglut -lGLU -lGL -o grp
